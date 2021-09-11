@@ -1,0 +1,34 @@
+ingressEndpoint:
+  - path: "/authorization"
+    serviceName: authorization-api-svc
+    port: 80
+  - path: "/management"
+    serviceName: management-graphql-svc
+    port: 80
+  - path: "/website"
+    serviceName: website-blazor-svc
+    port: 80
+  - path: "/jaeger"
+    serviceName: jaeger-all-in-one-query
+    port: 16686
+
+kubernetes-dashboard:
+  rbac:
+    clusterRoleMetrics: false
+    create: false
+  ingress:
+    enabled: true
+  #   annotations:
+  #     kubernetes.io/ingress.class: addon-http-application-routing
+  #     nginx.ingress.kubernetes.io/rewrite-target: /
+  #   hosts:
+  #     - api.d3b25f14f97c45328024.australiaeast.aksapp.io
+  #   paths:
+  #     - /dashboard
+  # protocolHttp: true
+
+jaeger-operator:
+  rbac:
+    create: false
+  serviceAccount:
+    create: false

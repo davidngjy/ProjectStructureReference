@@ -1,0 +1,12 @@
+apiVersion: v2
+name: cluster-infrastructure
+version: 1.0.0
+description: Deploy Cluster Specific Configuration
+type: application
+dependencies:
+  - name: kubernetes-dashboard
+    version: 5.0.0
+    repository: https://kubernetes.github.io/dashboard
+  - name: jaeger-operator
+    version: 2.23.0
+    repository: https://jaegertracing.github.io/helm-charts

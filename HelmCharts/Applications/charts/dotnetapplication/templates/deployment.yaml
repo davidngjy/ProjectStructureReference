@@ -27,6 +27,8 @@ spec:
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         env:
+          - name: JAEGER_SERVICE_NAME
+            value: {{ .Values.applicationName }}
           {{- range $key, $value := .Values.env }}
           - name: {{ $key | quote }}
             value: {{ $value | default "" | quote }}
