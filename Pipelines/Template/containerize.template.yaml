@@ -1,0 +1,73 @@
+parameters:
+  azureContainerRegistry: ''
+  azureSubscriptionEndpoint: ''
+  applications: []
+
+stages:
+- ${{ each application in parameters.applications }}:
+  - stage: check_for_${{ lower(replace(application.name, '.', '_')) }}_changes_stage
+    displayName: Check for ${{ application.name }} Changes Stage
+    dependsOn: []
+    jobs:
+    - job: check_for_${{ lower(replace(application.name, '.', '_')) }}_changes_job
+      displayName: Check for ${{ application.name }} Changes Job
+      steps:
+      - task: Bash@3
+        displayName: Check for ${{ application.name }} Changes
+        name: CheckChanges
+        inputs:
+          targetType: inline
+          script: |
+            #!/bin/sh
+
+            git diff --quiet refs/remotes/origin/main -- ${{ application.path }} --exit-code
+            exitcode=$?
+
+            if [[ $exitcode -eq 1 ]] ; then
+              echo "##[debug]Setting 'HasChanges' to True"
+              echo "##vso[task.setvariable variable=HasChanges;isOutput=true]True"
+            else
+              echo "##[debug]Setting 'HasChanges' to False"
+              echo "##vso[task.setvariable variable=HasChanges;isOutput=true]False"
+            fi
+            
+  - stage: build_publish_image_${{ lower(replace(application.name, '.', '_')) }}_stage
+    displayName: Build And Publish ${{ application.name }} Image
+    dependsOn: check_for_${{ lower(replace(application.name, '.', '_')) }}_changes_stage
+    condition: eq(dependencies.check_for_${{ lower(replace(application.name, '.', '_')) }}_changes_stage.outputs['check_for_${{ lower(replace(application.name, '.', '_')) }}_changes_job.CheckChanges.HasChanges'], 'True')
+    jobs:
+    - deployment: build_publish_image_${{ lower(replace(application.name, '.', '_')) }}_deployment
+      displayName: Build and Publish ${{ application.name }}
+      environment: ${{ application.environment }}
+
+      pool:
+        name: Azure Pipelines
+        vmImage: ubuntu-20.04
+      
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+
+              - task: DockerCompose@0
+                displayName: Build services
+                inputs:
+                  action: Build services
+                  azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+                  azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+                  dockerComposeFile: ${{ application.path }}/docker-compose.yml
+                  dockerComposeFileArgs: |
+                    PAT=$(System.AccessToken)
+                    DOCKER_REGISTRY=${{ parameters.azureContainerRegistry }}
+
+              - task: DockerCompose@0
+                displayName: Push services
+                inputs:
+                  action: Push services
+                  azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+                  azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+                  dockerComposeFile: ${{ application.path }}/docker-compose.yml
+                  dockerComposeFileArgs: |
+                    PAT=$(System.AccessToken)
+                    DOCKER_REGISTRY=${{ parameters.azureContainerRegistry }}

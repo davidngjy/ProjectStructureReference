@@ -14,3 +14,8 @@
 2. Switch directory to ./HelmCharts/Applications
 3. Execute `helm upgrade application-deployment . -f .\values.local.yaml --install --atomic --wait --debug`
     * Deploy helm chart using locally built image (note: values.local.yaml)
+
+## Ongoing development
+1. Bump the application respective tag version in docker-compose.yaml (same folder as the .sln)
+2. Make sure ./Applictions/docker-compose.yaml is aligned with the same version (for local development)
+3. Bump to the same version in ./HelmCharts/Applications/values.yaml (this result in deployment on CI/CD pipeline)

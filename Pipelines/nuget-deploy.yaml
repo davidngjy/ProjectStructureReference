@@ -1,0 +1,29 @@
+trigger: none
+
+steps:
+- task: UseDotNet@2
+  displayName: Use .NET 6.x SDK
+  inputs:
+    version: 6.x
+    includePreviewVersions: true
+
+- task: DotNetCoreCLI@2
+  displayName: Build Contract Projects
+  inputs:
+    command: build
+    projects: Contracts/**/*.csproj
+
+- task: DotNetCoreCLI@2
+  displayName: Pack Contract Projects
+  inputs: 
+    command: pack
+    outputDir: $(Build.ArtifactStagingDirectory)
+    projects: Contracts/**/*.csproj
+
+- task: DotNetCoreCLI@2
+  displayName: Push to Custom Feed
+  inputs:
+    command: push
+    packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg;!$(Build.ArtifactStagingDirectory)/*.Tests.nupkg
+    nuGetFeedType: internal
+    publishVstsFeed: {custom feed name}

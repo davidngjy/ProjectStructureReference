@@ -1,0 +1,113 @@
+parameters:
+  azureSubscriptionEndpoint: ''
+  azureResourceGroup: ''
+  kubernetesCluster: ''
+  helmCharts: []
+
+stages:
+- ${{ each helmChart in parameters.helmCharts }}:
+  - stage: check_for_${{ lower(replace(helmChart.name, '-', '_')) }}_changes_stage
+    displayName: Check for ${{ helmChart.name }} Changes Stage
+    dependsOn: []
+    jobs:
+    - job: check_for_${{ lower(replace(helmChart.name, '-', '_')) }}_changes_job
+      displayName: Check for ${{ helmChart.name }} Changes Job
+      steps:
+      - task: Bash@3
+        displayName: Check for ${{ helmChart.name }} Changes
+        name: CheckChanges
+        inputs:
+          targetType: inline
+          script: |
+            #!/bin/sh
+
+            git diff --quiet refs/remotes/origin/main -- ${{ helmChart.path }} --exit-code
+            exitcode=$?
+
+            if [[ $exitcode -eq 1 ]] ; then
+              echo "##[debug]Setting 'HasChanges' to True"
+              echo "##vso[task.setvariable variable=HasChanges;isOutput=true]True"
+            else
+              echo "##[debug]Setting 'HasChanges' to False"
+              echo "##vso[task.setvariable variable=HasChanges;isOutput=true]False"
+            fi
+
+  - stage: pre_${{ lower(replace(helmChart.name, '-', '_')) }}_deploy_stage
+    displayName: Pre-${{ helmChart.name }} Deploy Stage
+    dependsOn: check_for_${{ lower(replace(helmChart.name, '-', '_')) }}_changes_stage
+    condition: eq(dependencies.check_for_${{ lower(replace(helmChart.name, '-', '_')) }}_changes_stage.outputs['check_for_${{ lower(replace(helmChart.name, '-', '_')) }}_changes_job.CheckChanges.HasChanges'], 'True')
+    jobs:
+    - job: verify_${{ lower(replace(helmChart.name, '-', '_')) }}_chart_job
+      displayName: Verify ${{ helmChart.name }} Chart Job
+      steps:
+      - task: HelmDeploy@0
+        displayName: Helm Pull Dependencies
+        condition: eq(${{ helmChart.pullDependencies }}, 'True')
+        inputs:
+          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+          azureResourceGroup: ${{ parameters.azureResourceGroup }}
+          kubernetesCluster: ${{ parameters.kubernetesCluster }}
+          command: dependencies
+          arguments: update ${{ helmChart.path }}
+
+      - task: HelmDeploy@0
+        displayName: Helm Lint
+        inputs:
+          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+          azureResourceGroup: ${{ parameters.azureResourceGroup }}
+          kubernetesCluster: ${{ parameters.kubernetesCluster }}
+          command: lint
+          arguments: ${{ helmChart.path }} --with-subcharts
+      
+      - task: HelmDeploy@0
+        displayName: Helm Dry Run Deploy
+        inputs:
+          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+          azureResourceGroup: ${{ parameters.azureResourceGroup }}
+          kubernetesCluster: ${{ parameters.kubernetesCluster }}
+          command: upgrade
+          chartName: ${{ helmChart.name }}
+          chartType: FilePath
+          chartPath: ${{ helmChart.path }}
+          releaseName: ${{ helmChart.name }}
+          arguments: --dry-run
+  - stage: ${{ lower(replace(helmChart.name, '-', '_')) }}_deploy_stage
+    displayName: ${{ helmChart.name }} Deploy Stage
+    dependsOn: pre_${{ lower(replace(helmChart.name, '-', '_')) }}_deploy_stage
+    jobs:
+    - deployment: ${{ lower(replace(helmChart.name, '-', '_')) }}_deployment
+      displayName: ${{ helmChart.name }} Deployment
+      environment: ${{ helmChart.environment }}
+
+      pool:
+        name: Azure Pipelines
+        vmImage: ubuntu-20.04
+      
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+
+              - task: HelmDeploy@0
+                displayName: Helm Pull Dependencies
+                condition: eq(${{ helmChart.pullDependencies }}, 'True')
+                inputs:
+                  azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+                  azureResourceGroup: ${{ parameters.azureResourceGroup }}
+                  kubernetesCluster: ${{ parameters.kubernetesCluster }}
+                  command: dependencies
+                  arguments: update ${{ helmChart.path }}
+
+              - task: HelmDeploy@0
+                displayName: Helm Deploy
+                inputs:
+                  azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+                  azureResourceGroup: ${{ parameters.azureResourceGroup }}
+                  kubernetesCluster: ${{ parameters.kubernetesCluster }}
+                  command: upgrade
+                  chartName: ${{ helmChart.name }}
+                  chartType: FilePath
+                  chartPath: ${{ helmChart.path }}
+                  releaseName: ${{ helmChart.name }}
+                  arguments: --atomic --debug

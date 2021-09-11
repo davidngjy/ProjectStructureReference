@@ -1,0 +1,24 @@
+trigger: none
+
+variables:
+  azureContainerRegistry: {container registry url ending with '/'}
+  azureSubscriptionEndpoint: {service connection name}
+
+stages:
+- template: Template/containerize.template.yaml
+  parameters:
+    azureContainerRegistry: $(azureContainerRegistry)
+    azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+    applications:
+    - name: Authorization
+      path: Applications/Authorization
+      environment: Containerize-Authorization
+    - name: Email
+      path: Applications/Email
+      environment: Containerize-Email
+    - name: Management
+      path: Applications/Management
+      environment: Containerize-Management
+    - name: Website
+      path: Applications/Website
+      environment: Containerize-Website

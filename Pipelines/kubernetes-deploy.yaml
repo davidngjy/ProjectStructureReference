@@ -1,0 +1,22 @@
+trigger: none
+
+variables:
+  azureSubscriptionEndpoint: {service connection name}
+  azureResourceGroup: {resource group name}
+  kubernetesCluster: {cluster name}
+
+stages:
+- template: Template/kubernetes-deploy.template.yaml
+  parameters:
+    azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+    azureResourceGroup: $(azureResourceGroup)
+    kubernetesCluster: $(kubernetesCluster)
+    helmCharts:
+    - name: application-deployment
+      path: HelmCharts/Applications
+      environment: Deployment-Application
+      pullDependencies: false
+    - name: cluster-infrastructure-deployment
+      path: HelmCharts/Infrastructure
+      environment: Deployment-Cluster-Infrastructure
+      pullDependencies: true
