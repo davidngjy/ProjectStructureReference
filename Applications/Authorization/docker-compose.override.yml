@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  authorization.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__AuthorizationDB=${HostConnectionStrings_Authorization}
+    ports:
+      - "80"

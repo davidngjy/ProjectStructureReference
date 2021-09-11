@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  management.graphql:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__ManagementDB=${HostConnectionStrings_Management}
+    ports:
+      - "80"

@@ -1,0 +1,35 @@
+authorization-api:
+  applicationName: authorization-api
+  image:
+    repository: to-be-created.azurecr.io/authorization
+    tag: 1.0.0
+  secrets:
+    - name: ConnectionStrings__AuthorizationDB
+      valueFrom:
+        secretKeyRef:
+          name: db-connection-string
+          key: authorization-db
+
+email-worker:
+  applicationName: email-worker
+  image:
+    repository: to-be-created.azurecr.io/email
+    tag: 1.0.0
+
+management-graphql:
+  applicationName: management-graphql
+  image:
+    repository: to-be-created.azurecr.io/management
+    tag: 1.0.0
+  secrets:
+    - name: ConnectionStrings__ManagementDB
+      valueFrom:
+        secretKeyRef:
+          name: db-connection-string
+          key: management-db
+
+website-blazor:
+  applicationName: website-blazor
+  image:
+    repository: to-be-created.azurecr.io/website
+    tag: 1.0.0

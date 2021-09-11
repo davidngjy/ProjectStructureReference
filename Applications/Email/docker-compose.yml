@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  email.worker:
+    image: ${DOCKER_REGISTRY-}email:1.0.0
+    build:
+      context: .
+      dockerfile: Email.Worker/Dockerfile
+      args:
+        PAT: ${PAT}

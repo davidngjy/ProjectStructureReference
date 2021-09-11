@@ -1,0 +1,15 @@
+authorization-api:
+  image:
+    repository: authorization
+
+email-worker:
+  image:
+    repository: email
+
+management-graphql:
+  image:
+    repository: management
+
+website-blazor:
+  image:
+    repository: website

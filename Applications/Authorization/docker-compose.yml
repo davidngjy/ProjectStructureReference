@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  authorization.api:
+    image: ${DOCKER_REGISTRY-}authorization:1.0.0
+    build:
+      context: .
+      dockerfile: Authorization.API/Dockerfile
+      args:
+        PAT: ${PAT}

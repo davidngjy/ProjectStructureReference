@@ -1,0 +1,18 @@
+apiVersion: v2
+name: applications-deployment
+version: 1.0.0
+description: Deploy Applications
+type: application
+dependencies:
+  - name: dotnetapplication
+    version: 1.0.0
+    alias: authorization-api
+  - name: dotnetapplication
+    version: 1.0.0
+    alias: email-worker
+  - name: dotnetapplication
+    version: 1.0.0
+    alias: management-graphql
+  - name: dotnetapplication
+    version: 1.0.0
+    alias: website-blazor

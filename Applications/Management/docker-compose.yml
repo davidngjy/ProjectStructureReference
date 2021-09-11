@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  management.graphql:
+    image: ${DOCKER_REGISTRY-}management:1.0.0
+    build:
+      context: .
+      dockerfile: Management.GraphQL/Dockerfile
+      args:
+        PAT: ${PAT}

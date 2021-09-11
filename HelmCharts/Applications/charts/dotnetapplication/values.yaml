@@ -1,0 +1,26 @@
+global:
+  env:
+    JAEGER_AGENT_HOST: jaeger-all-in-one-agent
+    JAEGER_AGENT_PORT: 6831
+    ASPNETCORE_ENVIRONMENT: Development
+    JAEGER_SAMPLING_ENDPOINT: jaeger-all-in-one-agent:5778/sampling
+
+applicationName:
+
+replicas: 1
+
+image:
+  repository:
+  tag:
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi
+  limits:
+    cpu: 500m
+    memory: 1000Mi
+
+service:
+  containerPort: 80
+  exposePort: 80
