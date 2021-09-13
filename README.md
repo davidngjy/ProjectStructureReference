@@ -7,6 +7,9 @@
 ## To Begin
 - ./bootstrap-database.ps1 (Create two DB, Authorization and Management)
 - ./generate-database-login.ps1 (Create login, add to env var and k8s secret)
+- Generate a PAT with Package:Read permission. Add it to your environment variable 
+    - Name: PAT
+    - Value: {generated key}
 
 ## Deploy all applications to local docker instance
 1. In ./Applications folder, execute `docker-compose up -d`

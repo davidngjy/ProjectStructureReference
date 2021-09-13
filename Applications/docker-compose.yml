@@ -12,7 +12,7 @@ services:
       - ASPNETCORE_URLS=http://*:5001/
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__AuthorizationDB=${HostConnectionStrings_Authorization}
-      - KafkaOptions__BootstrapServers=kafka:29092
+      - KafkaOptions__BootstrapServers=kafka:9092
     ports:
       - "5001:5001"
   
@@ -24,8 +24,11 @@ services:
       args:
         PAT: ${PAT}
     environment:
+      - ASPNETCORE_URLS=http://*:5002/
       - ASPNETCORE_ENVIRONMENT=Development
-      - KafkaOptions__BootstrapServers=kafka:29092
+      - KafkaOptions__BootstrapServers=kafka:9092
+    ports:
+      - "5002:5002"
 
   management.graphql:
     image: management:latest
@@ -35,12 +38,12 @@ services:
       args:
         PAT: ${PAT}
     environment:
-      - ASPNETCORE_URLS=http://*:5002/
+      - ASPNETCORE_URLS=http://*:5003/
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__ManagementDB=${HostConnectionStrings_Management}
-      - KafkaOptions__BootstrapServers=kafka:29092
+      - KafkaOptions__BootstrapServers=kafka:9092
     ports:
-      - "5002:5002"
+      - "5003:5003"
 
   website.blazor:
     image: website:latest
@@ -50,11 +53,11 @@ services:
       args:
         PAT: ${PAT}
     environment:
-      - ASPNETCORE_URLS=http://*:5003/
+      - ASPNETCORE_URLS=http://*:5004/
       - ASPNETCORE_ENVIRONMENT=Development
-      - KafkaOptions__BootstrapServers=kafka:29092
+      - KafkaOptions__BootstrapServers=kafka:9092
     ports:
-      - "5003:5003"
+      - "5004:5004"
 
   ### Kafka related
   zookeeper:

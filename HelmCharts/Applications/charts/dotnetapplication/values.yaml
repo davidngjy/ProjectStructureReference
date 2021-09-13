@@ -4,6 +4,7 @@ global:
     JAEGER_AGENT_PORT: 6831
     ASPNETCORE_ENVIRONMENT: Development
     JAEGER_SAMPLING_ENDPOINT: jaeger-all-in-one-agent:5778/sampling
+    KafkaOptions__BootstrapServers: kafka-svc:9092
 
 applicationName:
 
