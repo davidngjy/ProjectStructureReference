@@ -8,6 +8,9 @@
 - ./bootstrap-database.ps1 (Create two DB, Authorization and Management)
 - ./generate-database-login.ps1 (Create login, add to env var and k8s secret)
 
+## Deploy all applications to local docker instance
+1. In ./Applications folder, execute `docker-compose up -d`
+
 ## Deploy all applications to local k8s instance
 1. In ./Applications folder, execute `docker-compose build`
     * Build all the docker images locally

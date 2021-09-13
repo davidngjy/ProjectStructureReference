@@ -1,15 +1,19 @@
 authorization-api:
   image:
     repository: authorization
+    tag: latest
 
 email-worker:
   image:
     repository: email
+    tag: latest
 
 management-graphql:
   image:
     repository: management
+    tag: latest
 
 website-blazor:
   image:
     repository: website
+    tag: latest
