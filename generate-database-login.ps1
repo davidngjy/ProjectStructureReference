@@ -46,4 +46,4 @@ COMMIT TRAN
     Write-Host("Successfully set EnvironmentVariable Key: HostConnectionStrings_$database Value: Server=host.docker.internal;Database=$database;User Id=$username;Password=$password;")
 }
 
-kubectl create secret generic db-connection-string --from-literal=authorization-db=Server="host.docker.internal;Database=Authorization;User Id=$username;Password=$password;" --from-literal=management-db=Server="host.docker.internal;Database=Management;User Id=$username;Password=$password;"
+# kubectl create secret generic db-connection-string --from-literal=authorization-db=Server="host.docker.internal;Database=Authorization;User Id=$username;Password=$password;" --from-literal=management-db=Server="host.docker.internal;Database=Management;User Id=$username;Password=$password;"
